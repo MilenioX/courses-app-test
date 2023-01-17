@@ -10,3 +10,5 @@ The CLI interface will be the only one way to call the exposed endpoints.
 - Java 17
 - JUnit
 
+#### Credits
+This project was done following up the instructions in the course "Building an Application Using Java SE 17" by "Sander Mak" in the pluralsight platform.
