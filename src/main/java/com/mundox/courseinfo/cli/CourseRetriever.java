@@ -1,5 +1,6 @@
 package com.mundox.courseinfo.cli;
 
+import com.mundox.courseinfo.cli.service.CourseRetrieverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,5 +24,9 @@ public class CourseRetriever {
 
     private static void retrieveCourses(String authorId) {
         LOG.info("Retrieving courses for author '{}'", authorId);
+        CourseRetrieverService courseRetrieverService = new CourseRetrieverService();
+
+        String coursesToStore = courseRetrieverService.getCoursesFor(authorId);
+        LOG.info("Retrieved the following courses {}", coursesToStore);
     }
 }
