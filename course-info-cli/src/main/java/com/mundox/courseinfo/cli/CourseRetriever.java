@@ -1,7 +1,9 @@
 package com.mundox.courseinfo.cli;
 
 import com.mundox.courseinfo.cli.service.CourseRetrieverService;
+import com.mundox.courseinfo.cli.service.CourseStorageService;
 import com.mundox.courseinfo.cli.service.PluralsightCourse;
+import com.mundox.courseinfo.repository.CourseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +32,15 @@ public class CourseRetriever {
     private static void retrieveCourses(String authorId) {
         LOG.info("Retrieving courses for author '{}'", authorId);
         CourseRetrieverService courseRetrieverService = new CourseRetrieverService();
+        CourseRepository courseRepository = CourseRepository.openCourseRepository("./courses.db");
+        CourseStorageService courseStorageService = new CourseStorageService(courseRepository);
 
         List<PluralsightCourse> coursesToStore = courseRetrieverService.getCoursesFor(authorId)
                 .stream()
                 .filter(not(PluralsightCourse::isRetired))
                 .toList();
         LOG.info("Retrieved the following {} courses {}", coursesToStore.size(), coursesToStore);
+        courseStorageService.storePluralsightCourses(coursesToStore);
+        LOG.info("Courses successfully stored");
     }
 }
