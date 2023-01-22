@@ -1,7 +1,13 @@
 package com.mundox.courseinfo.cli;
 
+import com.mundox.courseinfo.cli.service.CourseRetrieverService;
+import com.mundox.courseinfo.cli.service.PluralsightCourse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import static java.util.function.Predicate.not;
 
 public class CourseRetriever {
 
@@ -23,5 +29,12 @@ public class CourseRetriever {
 
     private static void retrieveCourses(String authorId) {
         LOG.info("Retrieving courses for author '{}'", authorId);
+        CourseRetrieverService courseRetrieverService = new CourseRetrieverService();
+
+        List<PluralsightCourse> coursesToStore = courseRetrieverService.getCoursesFor(authorId)
+                .stream()
+                .filter(not(PluralsightCourse::isRetired))
+                .toList();
+        LOG.info("Retrieved the following {} courses {}", coursesToStore.size(), coursesToStore);
     }
 }
