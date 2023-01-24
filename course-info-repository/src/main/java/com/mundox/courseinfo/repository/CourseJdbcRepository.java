@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 class CourseJdbcRepository implements CourseRepository {
 
@@ -16,6 +17,11 @@ class CourseJdbcRepository implements CourseRepository {
     private static final String INSERT_COURSE = """
             MERGE INTO Courses (id, name, length, url)
              VALUES (?, ?, ?, ?)
+            """;
+
+    private static final String ADD_NOTES = """
+            UPDATE Courses SET notes = ?
+             WHERE id = ?
             """;
     private final DataSource dataSource;
 
@@ -49,12 +55,25 @@ class CourseJdbcRepository implements CourseRepository {
                 Course course = new Course(resultSet.getString(1),
                         resultSet.getString(2),
                         resultSet.getLong(3),
-                        resultSet.getString(4));
+                        resultSet.getString(4),
+                        Optional.ofNullable(resultSet.getString(5)));
                 courses.add(course);
             }
             return Collections.unmodifiableList(courses);
         } catch (SQLException ex) {
             throw new RepositoryException("Failed to retrieve courses", ex);
+        }
+    }
+
+    @Override
+    public void addNotes(String id, String notes) {
+        try(Connection connection = dataSource.getConnection();) {
+            PreparedStatement statement = connection.prepareStatement(ADD_NOTES);
+            statement.setString(1, notes);
+            statement.setString(2, id);
+            statement.execute();
+        } catch (SQLException ex) {
+            throw new RepositoryException("Failed to add notes to " + id, ex);
         }
     }
 }
